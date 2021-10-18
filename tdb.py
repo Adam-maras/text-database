@@ -1,6 +1,5 @@
 import os
 import sys
-#start of the functions
 
 arr = os.listdir()
 arr2 = []
@@ -11,13 +10,13 @@ for file in arr:
         pass
 tdb_files = len(arr2)
 if tdb_files == 1:
+    multi_tdb = False
     solo_database = ''.join(arr2)
 elif tdb_files == 0:
-    pass
-else: 
-    print('There are too many databasees, you can only use one a the time (this will change in the next update)')
-    sys.exit()
-
+    solo_database = ''
+elif tdb_files > 1:
+    multi_tdb = True
+    solo_database = ''
 
 def existes():
     if tdb_files == 0:
@@ -25,31 +24,46 @@ def existes():
     else:
         return True
 
-def database(user_database_name):
-    if tdb_files == 0:
-        open(str(user_database_name) + '.tdb', 'w').close
-        print('Database: ' + str(user_database_name) + '.tdb' + ' was succesfully created!')
+def create(database_name):
+    open(str(database_name) + '.tdb', 'w').close
+    print('Database: ' + str(database_name) + '.tdb' + ' was succesfully created!')
+
+def write(writing_request, database_to_write = solo_database):
+    if multi_tdb == False:
+        f = open(solo_database, 'a')
+        f.write(str(writing_request))
+        f.close()
     else:
-        print('There are too many databasees, you can only use one a the time (this will change in the next update)')
+        try:
+            with open(database_to_write, 'a') as file:
+                file.write(str(writing_request))
+        except:
+            print('Please spesify wich database to write to.')
 
-def write(writing_request):
-    f = open(solo_database, 'a')
-    f.write(str(writing_request))
-    f.close()
-
-def overwrite(overwriting_request):
-    f = open(solo_database, 'w')
-    f.write(str(overwriting_request))
-    f.close()
-
+def overwrite(overwriting_request, database_to_write = solo_database):
+    if multi_tdb == False:
+        with open(solo_database, 'w') as file:
+            file.write(str(overwriting_request))
+    else: 
+        try:
+            with open(database_to_write, 'w') as file:
+                file.write(str(overwriting_request))
+        except:
+            print('Please spesify wich database to overwrite.')
+    
 def name():
     return solo_database
 
-def readline(line_to_read):
-    myfile = open(solo_database , "r")
+def readline(line_to_read, database_to_read = solo_database):
+    myfile = ''
+    if multi_tdb == False:
+        myfile = open(solo_database , "r")
+    else:
+       myfile = open(database_to_read + '.tdb', 'r')
+
     myline = myfile.readline()
     i = 0
-    while myline:
+    while myline: 
         myline = myfile.readline()
         if i == int(line_to_read) - 2:
             return myline.replace('\n', '')
@@ -58,17 +72,47 @@ def readline(line_to_read):
         i = i + 1
     myfile.close() 
     
-def read():
-    f = open(solo_database, 'r')
+def read(database_to_read = solo_database):
+    if  multi_tdb == False:
+        f = open(solo_database, 'r')
+    else:
+        try: 
+            f = open(database_to_read + '.tdb', 'r')
+        except:
+            print('Please spesify the database')
     return f.read()
 
-def delete():
-    comfirmation = input('Are you sure that you want to delete ' + solo_database + '? (Y/N)').lower()
-    if comfirmation == 'y':
-        os.remove(solo_database)
-        print('Database succesfuly deleted!')
-    elif comfirmation == 'yes':
-        os.remove(solo_database)
-        print('Database succesfuly deleted!')
+def delete(database_to_delete = solo_database):
+    if multi_tdb == False:
+        comfirmation = input('Are you sure that you want to delete ' + solo_database + '? (Y/N)').lower()
+        if comfirmation == 'y':
+            os.remove(solo_database)
+            print('Database succesfuly deleted!')
+        elif comfirmation == 'yes':
+            os.remove(solo_database)
+            print('Database succesfuly deleted!')
+        else:
+            print('I am not deleting ' + solo_database)
     else:
-        print('I am not deleting ' + solo_database)
+        try: 
+            comfirmation = input('Are you sure that you want to delete ' + database_to_delete + '? (Y/N)').lower()
+            if comfirmation == 'y':
+                os.remove(database_to_delete + '.tdb')
+                print('Database succesfuly deleted!')
+            elif comfirmation == 'yes':
+                os.remove(database_to_delete + '.tdb')
+                print('Database succesfuly deleted!')
+            else:
+                print('I am not deleting ' + database_to_delete)
+        except:
+            print('Please spesify the database that you want to delete.')
+
+#store vars
+
+def add_var(var_to_write, database_to_write = solo_database):
+    f = open(database_to_write, 'a')
+    variable_name = [k for k, v in locals().items() if v == var_to_write][0]
+    f.write(variable_name + '/' + var_to_write + '/' + str(type(var_to_write)))
+
+def get_var(var_to_get, var_database = solo_database):
+    pass
