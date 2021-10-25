@@ -107,12 +107,28 @@ def delete(database_to_delete = solo_database):
         except:
             print('Please spesify the database that you want to delete.')
 
-#store vars
+#store vars long term
 
-def add_var(var_to_write, database_to_write = solo_database):
+def write_var(var_name, var_to_write, database_to_write = solo_database):
     f = open(database_to_write, 'a')
-    variable_name = [k for k, v in locals().items() if v == var_to_write][0]
-    f.write(variable_name + '/' + var_to_write + '/' + str(type(var_to_write)))
-
-def get_var(var_to_get, var_database = solo_database):
-    pass
+    var_type = str(type(var_to_write)).replace("<class '", '').replace("'>", '')
+    f.write('\n' + str(var_name) + '/' + str(var_to_write )+ '/' + str(var_type))
+  
+def var(var_to_get, var_database = solo_database):
+    myfile = open(var_database, 'r')
+    myline = myfile.readline()
+    i = 0
+    while myline: 
+        myline = myfile.readline()
+        if myline.startswith(var_to_get):
+            split_line =  myline.split('/')
+            if split_line[2] == 'str':
+                return str(split_line[1])
+            elif split_line[2] == 'int':
+                return int(split_line[1])
+            elif split_line[2] == 'float':
+                return float(split_line[1])
+            else:
+                return split_line[1]
+        i = i + 1
+    myfile.close()
